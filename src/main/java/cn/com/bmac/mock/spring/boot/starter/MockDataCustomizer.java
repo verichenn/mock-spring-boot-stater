@@ -10,12 +10,12 @@ import java.util.Map;
  * @author CHAN
  * @since 2019-01-15
  */
-public interface MockDataCustomizer {
+public interface MockDataCustomizer<T> {
 
     /**
      * 自定义响应
      * @param requestParams 请求参数
      * @return 响应
      */
-    Map customize(Map requestParams);
+    Map customize(T requestParams);
 }

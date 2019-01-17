@@ -8,7 +8,8 @@ import java.util.Map;
  * @author CHAN
  * @since 2019-01-16
  */
-public class DefaultMockDataCustomizer implements MockDataCustomizer {
+public class DefaultMockDataCustomizer implements MockDataCustomizer<Map> {
+
     @Override
     public Map customize(Map requestParams) {
         return new HashMap();

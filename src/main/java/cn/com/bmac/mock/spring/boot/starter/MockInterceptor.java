@@ -1,10 +1,13 @@
 package cn.com.bmac.mock.spring.boot.starter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.ResolvableType;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -49,7 +52,7 @@ public class MockInterceptor extends HandlerInterceptorAdapter {
     private boolean doHandle(HttpServletRequest request, HttpServletResponse response) throws java.io.IOException {
         response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE);
         String requestURI = request.getRequestURI();
-        logger.info("request uri: {}.",requestURI);
+        logger.info("request uri: {}.", requestURI);
 
         ServletInputStream inputStream = request.getInputStream();
 
@@ -57,29 +60,49 @@ public class MockInterceptor extends HandlerInterceptorAdapter {
         if (Objects.isNull(outerMockData)) {
             return true;
         } else {
-
-            Map requestParams;
-            try {
-                requestParams = objectMapper.readValue(inputStream, Map.class);
-            } catch (Exception e) {
-                logger.error("json parser exception.", e);
-                requestParams = new HashMap();
-            }
-
             MockDataCustomizer mockDataCustomizer = customizers.getOrDefault(requestURI, new DefaultMockDataCustomizer());
 
-            Map respData = mockDataCustomizer.customize(requestParams);
+            ResolvableType resolvableType = ResolvableType.forClass(mockDataCustomizer.getClass());
+            Class<?> resolve = resolvableType.getInterfaces()[0].getGeneric(0).resolve();
+
+            Object requestObj = null;
+            boolean hasErrors = false;
+            try {
+                requestObj = objectMapper.readValue(inputStream, resolve);
+            } catch (Exception e) {
+                if (e instanceof MismatchedInputException) {
+                    logger.warn("the request body may be empty. {}", e.getMessage());
+                    if (resolve.isAssignableFrom(Map.class)) {
+                        requestObj = new HashMap<>();
+                    } else {
+                        try {
+                            requestObj = resolve.newInstance();
+                        } catch (Exception ex) {
+                            hasErrors = true;
+                        }
+                    }
+                }else {
+                    hasErrors = true;
+                }
+            }
+            if(hasErrors){
+                response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+                response.getWriter().write("json parser error. please check your request body.");
+                response.flushBuffer();
+                return false;
+            }
+
+            Map respData = mockDataCustomizer.customize(requestObj);
 
             respData.putAll(outerMockData);
 
             String responseDataStr = objectMapper.writeValueAsString(respData);
-            logger.info("response data: {}",responseDataStr);
+            logger.info("response data: {}", responseDataStr);
 
             response.getWriter().write(responseDataStr);
             response.flushBuffer();
             return false;
         }
-
     }
 
 
