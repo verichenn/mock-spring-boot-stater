@@ -83,3 +83,7 @@ bmac:
    ```
 
 ![微信截图_20190116200241](assets/微信截图_20190116200241.png)
+
+##### TODO LIST
+- 泛型，`cn.com.bmac.mock.spring.boot.starter.MockDataCustomizer#customize`根据泛型传入参数
+- 把自定义响应支持到方法级别，减少类定义个数
