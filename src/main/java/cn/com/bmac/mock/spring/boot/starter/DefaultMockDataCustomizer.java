@@ -8,9 +8,9 @@ import java.util.Map;
  * @author CHAN
  * @since 2019-01-16
  */
-public class DefaultMockResponse implements MockResponse {
+public class DefaultMockDataCustomizer implements MockDataCustomizer {
     @Override
-    public Map customizeResponse(Map requestParams) {
+    public Map customize(Map requestParams) {
         return new HashMap();
     }
 }

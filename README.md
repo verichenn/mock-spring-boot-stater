@@ -25,7 +25,7 @@ bmac:
 
 1. **POST** `http://ip:port/${base-uri}/update`
 
-   - 设置动态响应数据
+   - 设置动态响应数据，如果value设置为null，请求将会由业务处理器处理，如`"demo/order":null`。
 
    ![微信截图_20190116190806](assets/微信截图_20190116190806.png)
 

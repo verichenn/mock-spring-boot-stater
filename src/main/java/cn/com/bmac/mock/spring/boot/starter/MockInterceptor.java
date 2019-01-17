@@ -26,7 +26,7 @@ public class MockInterceptor extends HandlerInterceptorAdapter {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    private Map<String, MockResponse> mocks = new ConcurrentHashMap<>();
+    private Map<String, MockDataCustomizer> mocks = new ConcurrentHashMap<>();
 
     private ApplicationContext applicationContext;
 
@@ -66,9 +66,9 @@ public class MockInterceptor extends HandlerInterceptorAdapter {
                 requestParams = new HashMap();
             }
 
-            MockResponse mockResponse = mocks.getOrDefault(requestURI, new DefaultMockResponse());
+            MockDataCustomizer mockDataCustomizer = mocks.getOrDefault(requestURI, new DefaultMockDataCustomizer());
 
-            Map respData = mockResponse.customizeResponse(requestParams);
+            Map respData = mockDataCustomizer.customize(requestParams);
 
             respData.putAll(mockData);
 
@@ -81,9 +81,9 @@ public class MockInterceptor extends HandlerInterceptorAdapter {
 
 
     private void initMockResponse() {
-        Map<String, MockResponse> beansOfType = applicationContext.getBeansOfType(MockResponse.class);
+        Map<String, MockDataCustomizer> beansOfType = applicationContext.getBeansOfType(MockDataCustomizer.class);
         beansOfType.values().forEach(mock -> {
-            Class<? extends MockResponse> mockClass = mock.getClass();
+            Class<? extends MockDataCustomizer> mockClass = mock.getClass();
             boolean annotationPresent = mockClass.isAnnotationPresent(MockTarget.class);
             if (annotationPresent) {
                 MockTarget annotation = mockClass.getAnnotation(MockTarget.class);
