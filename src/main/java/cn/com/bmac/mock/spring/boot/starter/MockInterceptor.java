@@ -49,7 +49,7 @@ public class MockInterceptor extends HandlerInterceptorAdapter {
     private boolean doHandle(HttpServletRequest request, HttpServletResponse response) throws java.io.IOException {
         response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE);
         String requestURI = request.getRequestURI();
-        logger.info("request uri was {}.",requestURI);
+        logger.info("request uri: {}.",requestURI);
 
         ServletInputStream inputStream = request.getInputStream();
 
@@ -72,7 +72,10 @@ public class MockInterceptor extends HandlerInterceptorAdapter {
 
             respData.putAll(outerMockData);
 
-            response.getWriter().write(objectMapper.writeValueAsString(respData));
+            String responseDataStr = objectMapper.writeValueAsString(respData);
+            logger.info("response data: {}",responseDataStr);
+
+            response.getWriter().write(responseDataStr);
             response.flushBuffer();
             return false;
         }
