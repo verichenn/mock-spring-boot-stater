@@ -38,7 +38,7 @@ public class MockInterceptor extends HandlerInterceptorAdapter {
         this.applicationContext = applicationContext;
         this.mockDataManager = mockDataManager;
         this.objectMapper = objectMapper;
-        this.initMockResponse();
+        this.collectMockResponse();
     }
 
     @Override
@@ -80,7 +80,7 @@ public class MockInterceptor extends HandlerInterceptorAdapter {
     }
 
 
-    private void initMockResponse() {
+    private void collectMockResponse() {
         Map<String, MockDataCustomizer> beansOfType = applicationContext.getBeansOfType(MockDataCustomizer.class);
         beansOfType.values().forEach(mock -> {
             Class<? extends MockDataCustomizer> mockClass = mock.getClass();
