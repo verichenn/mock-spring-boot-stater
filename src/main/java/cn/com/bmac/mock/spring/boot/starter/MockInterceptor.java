@@ -30,13 +30,13 @@ public class MockInterceptor extends HandlerInterceptorAdapter {
 
     private ApplicationContext applicationContext;
 
-    private final MockDataManager mockDataManager;
+    private final OuterMockDataManager outerMockDataManager;
 
     private ObjectMapper objectMapper;
 
-    MockInterceptor(ApplicationContext applicationContext, MockDataManager mockDataManager, ObjectMapper objectMapper) {
+    MockInterceptor(ApplicationContext applicationContext, OuterMockDataManager outerMockDataManager, ObjectMapper objectMapper) {
         this.applicationContext = applicationContext;
-        this.mockDataManager = mockDataManager;
+        this.outerMockDataManager = outerMockDataManager;
         this.objectMapper = objectMapper;
         this.collectMockDataCustomizer();
     }
@@ -53,8 +53,8 @@ public class MockInterceptor extends HandlerInterceptorAdapter {
 
         ServletInputStream inputStream = request.getInputStream();
 
-        Map mockData = (Map) mockDataManager.getMockData(requestURI);
-        if (Objects.isNull(mockData)) {
+        Map outerMockData = (Map) outerMockDataManager.getOuterMockData(requestURI);
+        if (Objects.isNull(outerMockData)) {
             return true;
         } else {
 
@@ -70,7 +70,7 @@ public class MockInterceptor extends HandlerInterceptorAdapter {
 
             Map respData = mockDataCustomizer.customize(requestParams);
 
-            respData.putAll(mockData);
+            respData.putAll(outerMockData);
 
             response.getWriter().write(objectMapper.writeValueAsString(respData));
             response.flushBuffer();

@@ -34,7 +34,7 @@ public class MockAutoConfiguration {
         return new WebMvcConfigurer() {
             @Override
             public void addInterceptors(InterceptorRegistry registry) {
-                HandlerInterceptor mockInterceptor = new MockInterceptor(applicationContext, mockDataManager(), objectMapper);
+                HandlerInterceptor mockInterceptor = new MockInterceptor(applicationContext, outerMockDataManager(), objectMapper);
                 registry.addInterceptor(mockInterceptor)
                         .addPathPatterns(mockProperties.getPathPatterns());
             }
@@ -42,12 +42,12 @@ public class MockAutoConfiguration {
     }
 
     @Bean
-    public MockDataManager mockDataManager(){
-        return new MockDataManager();
+    public OuterMockDataManager outerMockDataManager(){
+        return new OuterMockDataManager();
     }
 
     @Bean
     public MockController mockController(){
-        return new MockController(mockDataManager());
+        return new MockController(outerMockDataManager());
     }
 }

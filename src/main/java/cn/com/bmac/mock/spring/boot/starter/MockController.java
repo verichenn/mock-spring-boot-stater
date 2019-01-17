@@ -18,22 +18,22 @@ import java.util.Map;
 @RequestMapping(path = "${bmac.mock.base-uri:/mock}")
 public class MockController {
 
-    private final MockDataManager mockDataManager;
+    private final OuterMockDataManager outerMockDataManager;
 
     @Autowired
-    public MockController(MockDataManager mockDataManager) {
-        this.mockDataManager = mockDataManager;
+    public MockController(OuterMockDataManager outerMockDataManager) {
+        this.outerMockDataManager = outerMockDataManager;
     }
 
     @PostMapping("/update")
     public Map upd(@RequestBody Map map) {
-        mockDataManager.setAll(map);
-        return mockDataManager.getAll();
+        outerMockDataManager.setAll(map);
+        return outerMockDataManager.getAll();
     }
 
     @GetMapping("/query")
     public Map query(){
-        return mockDataManager.getAll();
+        return outerMockDataManager.getAll();
     }
 
 }
