@@ -78,6 +78,7 @@ public class MockInterceptor extends HandlerInterceptorAdapter {
                         try {
                             requestObj = resolve.newInstance();
                         } catch (Exception ex) {
+                            logger.error("{} instance error. {}",resolve,ex.getMessage());
                             hasErrors = true;
                         }
                     }
